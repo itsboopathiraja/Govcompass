@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Add your custom styles here */
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Navigation Bar Styles */
+    .navbar {
+        background-color: #343a40;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        color: #ffffff;
+        font-size: 1rem;
+        margin-right: 15px;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #17a2b8;
+    }
+
+    /* Banner Styles */
+    .banner {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .banner img {
+        width: 100%;
+        height: auto;
+    }
+
+    .banner-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #ffffff;
+        z-index: 100;
+    }
+
+    .banner-text h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .banner-text p {
+        font-size: 1.5rem;
+    }
+
+    /* Content Styles */
+    .content {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    /* Table Styles */
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th, .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table th {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    
+.status-update-form {
+    display: flex;
+    flex-direction: column;  /* Change this from row to column */
+    align-items: flex-start;  /* Align items to the start */
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.status-update-form select {
+    margin-bottom: 10px;  /* Add a bottom margin to create space between the select and button */
+}
+
+.status-update-form button {
+    width: 100px;  /* Set a fixed width for the button */
+}
+
+
+</style>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <a class="navbar-brand" href="#">GovCompass</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">Home</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('admin_compliant') }}">View Complaints</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-logout" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+            <!-- Add other navbar links as needed -->
+        </ul>
+    </div>
+</nav>
+
+<!-- Banner Image and Text -->
+
+<!-- Content -->
+<div class="container content">
+    <br>
+    <h1 class="mb-4">Admin Dashboard for {{ role }}</h1>
+    {% if results %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Compliant Type</th>
+                <th>Description</th>
+                <th>City</th>
+                <th>Street</th>
+                <th>Pincode</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th>Action</th> 
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+                <tr>
+                    <td>{{ result[0] }}</td>
+                    <td>{{ result[1] }}</td>
+                    <td>{{ result[2] }}</td>
+                    <td>{{ result[3] }}</td>
+                    <td>{{ result[4] }}</td>
+                    <td>{{ result[5] }}</td>
+                    <td>
+                        {% if result[6] %}
+                            <img src="{{ url_for('uploaded_file', filename=result[6]) }}" alt="Complaint Image" style="max-width: 100px; max-height: 100px;" data-toggle="modal" data-target="#imageModal{{ loop.index }}">
+                            <!-- Modal -->
+                            <div class="modal fade" id="imageModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <img src="{{ url_for('uploaded_file', filename=result[6]) }}" class="img-fluid" alt="Complaint Image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            No Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if result[7] == 'PENDING' %}
+                            <span style="color: orange;">{{ result[7] }}</span>
+                        {% elif result[7] == 'COMPLETED' %}
+                            <span style="color: green;">{{ result[7] }}</span>
+                        {% else %}
+                            {{ result[7] }}
+                        {% endif %}
+                    </td>
+                    <td class="status-update-form">
+                        <form action="{{ url_for('update_status', id=result[0]) }}" method="post">
+                            <select name="new_status" class="form-control">
+                                <option value="PENDING">Pending</option>
+                                <option value="PROCESSING">Processing</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                        <!-- Add a line break to separate the buttons -->
+                        <br>
+                        <!-- Add this inside your <td> where you want the reply button to be -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#replyModal{{ loop.index }}">
+                          Reply
+                        </button>
+                        <!-- Add this modal inside your <td> -->
+                        <div class="modal fade" id="replyModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Reply to Complaint</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                                </button>
+                              </div>
+                              <form action="{{ url_for('reply_complaint', id=result[0]) }}" method="post">
+                                <div class="modal-body">
+                                  <textarea name="reply" class="form-control" placeholder="Write your reply here..."></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  <button type="submit" class="btn btn-primary">Send Reply</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                    </td>                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No complaints found.</p>
+{% endif %}
+</div>
+
+{% endblock %}

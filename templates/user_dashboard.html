@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Add your custom styles here */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    /* Navigation Bar Styles */
+    .navbar {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Banner Styles */
+    .banner {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .banner img {
+        width: 100%;
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .banner-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #080808;
+        z-index: 100; /* Ensure the text is above the image */
+    }
+
+    /* Content Styles */
+    .content {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    /* Dashboard Styles */
+    .dashboard {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .dashboard-card {
+        width: 300px;
+        margin: 20px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        background: linear-gradient(to right, #ff9966, #ff5e62); /* Shiny gradient background */
+        color: white; /* White text color */
+    }
+
+    .dashboard-card h2 {
+        margin-bottom: 20px;
+    }
+
+    .dashboard-card .count-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    /* Greeting Styles */
+    .greeting {
+        text-align: center;
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .greeting h2 {
+        color: #6c757d;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+</style>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <a class="navbar-brand" href="#">GovCompass</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_dashboard') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('add_compliant') }}">New Complaint</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_compliant') }}">View Complaint</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_logout') }}">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_profile') }}">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </li>
+            <!-- Add other navbar links as needed -->
+        </ul>
+    </div>
+</nav>
+<!-- Banner Image and Text -->
+<div class="banner">
+    <br>
+    <img src="/static/images/dash.png" alt="Banner Image" class="img-fluid">
+    <div class="banner-text">
+        <h1>Welcome to Your Dashboard</h1>
+        <p>Your personalized dashboard experience.</p>
+    </div>
+</div>
+
+<!-- Greeting -->
+<div class="greeting">
+    <h2>Hello, {{ username }}! Have a great day!</h2>
+</div>
+
+<!-- Content -->
+<div class="container content">
+    <!-- Display user-specific information -->
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+        <div class="dashboard-card">
+            <h2>Complaints Submitted</h2>
+            <p class="count-number">{{ submitted_count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>Complaints Resolved</h2>
+            <p class="count-number">{{ resolved_count }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>Complaints Pending</h2>
+            <p class="count-number">{{ pending_count }}</p>
+        </div>
+        <!-- Feedback Card -->
+        <div class="dashboard-card" data-toggle="modal" data-target="#feedbackModal">
+            <h2>Give Feedback</h2>
+            <p>Click here to give feedback and suggestions</p>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="feedbackModalLabel">Give Feedback</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <form method="POST" action="{{ url_for('feedback') }}">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="feedback">Feedback</label>
+                <textarea class="form-control" id="feedback" name="feedback" rows="3" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="suggestion">Suggestion</label>
+                <textarea class="form-control" id="suggestion" name="suggestion" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="rating">Rating</label>
+                <select class="form-control" id="rating" name="rating" required>
+                  <option value="1">1 Star</option>
+                  <option value="2">2 Stars</option>
+                  <option value="3">3 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+{% endblock %}

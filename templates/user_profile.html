@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Add this to your CSS file or create a new one */
+
+    body {
+        background-color: rgb(250, 250, 250);
+        background-size: cover;
+        height: 100vh;
+        margin: 0; /* Remove default body margin */
+    }
+
+    .navbar {
+        background-color: rgba(0, 0, 0, 0.8); /* Add a semi-transparent black background to the navbar */
+    }
+
+    .container {
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 50px;
+    }
+
+    .card {
+        background: none;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Greeting Styles */
+    .greeting {
+        text-align: center;
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .greeting h2 {
+        color: #6c757d;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+</style>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <a class="navbar-brand" href="#">GovCompass</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_dashboard') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('add_compliant') }}">New Complaint</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_compliant') }}">View Complaint</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_logout') }}">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user_profile') }}">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Greeting -->
+<div class="greeting">
+    <h2>Hello, {{ user[0] }}! This is your profile.</h2>
+</div>
+
+<!-- User Profile -->
+<div class="container">
+    <h1>User Profile</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ user[0] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user[1] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="contact_no">Contact Number</label>
+            <input type="text" class="form-control" id="contact_no" name="contact_no" value="{{ user[2] }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+</div>
+{% endblock %}

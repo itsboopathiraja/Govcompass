@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>GovCompass</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 10px;
+        }
+
+        .card {
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .btn-logout {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-logout:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        
+        
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .square-card {
+            width: 300px;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background: linear-gradient(to right, #ff9966, #ff5e62); /* Shiny gradient background */
+            color: white; /* White text color */
+        }
+
+        .square-card h2 {
+            margin-bottom: 20px;
+        }
+
+        .square-card .count-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">GovCompass:Guiding Citizens to Services </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Home</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ url_for('admin_compliant') }}">View Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-logout" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="container mt-3">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Dashboard</h3>
+            </div>
+            <div class="card-body">
+                <h1>Welcome, {{ username }}!</h1>
+                <p>Your role: {{ role }}</p>
+                <canvas id="complaintChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="dashboard">
+        <div class="square-card">
+            <h2>Total Complaints</h2>
+            <p class="count-number">{{ total_count }}</p>
+        </div>
+        <div class="square-card" style="background: linear-gradient(to right, #ff9966, #ff5e62);">
+            <h2>Processing Complaints</h2>
+            <p class="count-number">{{ processing_count }}</p>
+        </div>
+        <div class="square-card" style="background: linear-gradient(to right, #00c6ff, #0072ff);">
+            <h2>Completed Complaints</h2>
+            <p class="count-number">{{ completed_count }}</p>
+        </div>
+        <div class="square-card" style="background: linear-gradient(to right, #f7971e, #ffd200);">
+            <h2>Pending Complaints</h2>
+            <p class="count-number">{{ pending_count }}</p>
+        </div>
+    </div>
+    
+    
+
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch data from the server or use data from the backend
+            var complaintData = {
+                labels: ['Total', 'Processing', 'Completed', 'Pending'],
+                datasets: [{
+                    label: 'Complaint Status',
+                    data: [{{ total_count }}, {{ processing_count }}, {{ completed_count }}, {{ pending_count }}],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+    
+            // Get the chart canvas element
+            var ctx = document.getElementById('complaintChart').getContext('2d');
+    
+            // Create the chart
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: complaintData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>
